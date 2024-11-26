@@ -18,14 +18,14 @@ import UserModule from './user.module';
     ScheduleModule.forRoot(),
     BullModule.forRoot({
       connection: {
-        host: 'localhost',
+        host: process.env.REDIS_HOST,
         port: 6379,
       },
     }),
     BullModule.registerQueue({ name: 'alert' }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
-      host: 'localhost',
+      host: process.env.DB_HOST,
       port: 5432,
       username: 'postgres',
       password: 'hyperhire',

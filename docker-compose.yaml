@@ -1,22 +1,66 @@
-version: '3.8'
+version: "3.8"
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "8080:8080"
     environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASS=root
-      - DB_NAME=blockchain
+      NODE_ENV: development
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      Moralis_API_KEY: ${Moralis_API_KEY}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: hyperhire
+      DB_NAME: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
-      - db
+      - postgres
+      - redis
 
-  db:
-    image: mysql:8
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: blockchain
+  postgres:
+    image: postgres:15
     ports:
-      - "3306:3306"
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: hyperhire
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: hyperhire_database
+    ports:
+      - "6379:6379"
+
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sh -c "npm run migration:run && npm run seed:run"
+    environment:
+      NODE_ENV: development
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      Moralis_API_KEY: ${Moralis_API_KEY}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: hyperhire
+      DB_NAME: postgres
+    depends_on:
+      - postgres
+      - redis
+  
+volumes:
+  postgres_data:

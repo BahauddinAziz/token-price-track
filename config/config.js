@@ -1,9 +1,9 @@
-{
+module.exports = {
     "development": {
         "username": "postgres",
         "password": "hyperhire",
         "database": "postgres",
-        "host": "localhost",
+        "host": process.env.DB_HOST,
         "dialect": "postgres"
     }
 }
